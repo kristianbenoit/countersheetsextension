@@ -49,7 +49,9 @@ PDF_DPI = 300
 DEFAULT_REGISTRATION_MARK_STYLE = "stroke:#aaa"
 
 class Counter:
-    def __init__(self, repeat):
+    def __init__(self, nr):
+        self.nr = nr
+        self.keep_going = True
         self.repeat = repeat
         self.parts = []
         self.subst = {}
@@ -69,10 +71,11 @@ class Counter:
         self.bleed_added = {}
 
     def can_add_another(self):
-        return self.repeat.can_add_another()
+        return self.nr > 0 or self.keep_going
 
+    @abstractmethod
     def added_one(self, last_on_row, last_in_box, last_on_sheet):
-        self.repeat.added_one(last_on_row, last_in_box, last_on_sheet)
+        self.nr -= 1
 
     def set(self, setting):
         setting.applyto(self)
@@ -130,41 +133,33 @@ class CounterSettingHolder:
             back = counter.doublesided()
             self.setting.applyto(back)
 
-class DummyRepeat:
+class DummyCounter(Counter):
     def can_add_another(self):
         return False
 
     def added_one(self, last_on_row, last_in_box, last_on_sheet):
-        pass
+        super().added_one()
 
-class Repeat:
-    def __init__(self, nr):
-        self.nr = nr
-        self.keep_going = True
-
-    def can_add_another(self):
-        return self.nr > 0 or self.keep_going
-
-class RepeatExact(Repeat):
+class RepeatExact(Counter):
     def added_one(self, last_on_row, last_in_box, last_on_sheet):
-        self.nr -= 1
+        super().added_one()
         self.keep_going = False
 
-class RepeatMinFillRow(Repeat):
+class RepeatMinFillRow(Counter):
     def added_one(self, last_on_row, last_in_box, last_on_sheet):
-        self.nr -= 1
+        super().added_one()
         if last_on_row and self.nr <= 0:
             self.keep_going = False
 
-class RepeatMinFillBox(Repeat):
+class RepeatMinFillBox(Counter):
     def added_one(self, last_on_row, last_in_box, last_on_sheet):
-        self.nr -= 1
+        super().added_one()
         if last_in_box and self.nr <= 0:
             self.keep_going = False
 
-class RepeatMinFillSheet(Repeat):
+class RepeatMinFillSheet(Counter):
     def added_one(self, last_on_row, last_in_box, last_on_sheet):
-        self.nr -= 1
+        super().added_one()
         if last_on_sheet and self.nr <= 0:
             self.keep_going = False
 
