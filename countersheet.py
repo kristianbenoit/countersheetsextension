@@ -48,19 +48,20 @@ PDF_DPI = 300
 
 DEFAULT_REGISTRATION_MARK_STYLE = "stroke:#aaa"
 
+# Could be a token, a card, ... some 2d piecce printed on paper/cardboard.
 class Counter:
     def __init__(self, nr):
-        self.nr = nr
-        self.keep_going = True
-        self.repeat = repeat
-        self.parts = []
-        self.subst = {}
-        self.back = None
-        self.id = None
-        self.endbox = False
-        self.endrow = False
-        self.hasback = False
-        self.attrs = {}
+        self.nr = nr # the amount of counters left to print
+        self.keep_going = True # Print some more?
+        self.repeat = repeat # Unused ... because of my modifs ... was way to tell when to stop printing?
+        self.parts = [] # ?
+        self.subst = {} # A dictionnaty for text substitution, replace key (as text) by value (as text)?
+        self.back = None # Another counter instance (card) to represent the rear side?
+        self.id = None # Old attribute, not in use, now defined in subclasses ... that are not actually inheriting so technically not subclasses?
+        self.endbox = False # ?
+        self.endrow = False # ?
+        self.hasback = False # redondant information, same as self.back == None ?
+        self.attrs = {} # ?
         self.excludeids = []
         self.includeids = []
         self.bleed_up = []
